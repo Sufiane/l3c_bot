@@ -1,0 +1,24 @@
+{
+  "name": "l3c_bot",
+  "version": "1.0.0",
+  "description": "L3C's bot, know the latest and upcoming movies directly in messenger",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sufiane/l3c_bot.git"
+  },
+  "author": "Sufiane Souissi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sufiane/l3c_bot/issues"
+  },
+  "homepage": "https://github.com/Sufiane/l3c_bot#readme",
+  "dependencies": {
+    "dotenv": "^4.0.0",
+    "messenger-bot": "^2.4.0"
+  }
+}
