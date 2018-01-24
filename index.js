@@ -64,6 +64,8 @@ const handleUserCommand = (message) => {
             return requestMovieApi(constants.topRated)
         case constants.nowPlaying:
             return requestMovieApi(constants.nowPlaying)
+        case constants.easterEgg:
+            return Promise.resolve('Pocoyo Pocoyo !!')
         default:
             return Promise.resolve(`Désolé je ne comprends que les méthodes qui font parties de cette liste: ${constants.commandList}`)
     }

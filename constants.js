@@ -10,4 +10,6 @@ exports.popular = '/popular'
 exports.nowPlaying = '/now_playing'
 exports.topRated = '/top_rated'
 
+exports.easterEgg = 'Mademoiselle'
+
 exports.commandList = [exports.upcoming, exports.popular, exports.nowPlaying, exports.topRated]
