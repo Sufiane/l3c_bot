@@ -20,7 +20,7 @@ l3cBot.on('error', function(err) {
     console.log(`Global error: ${err.message}`)
 })
 
-// TODO: need to be reworked ! 
+// TODO: need to be reworked !
 /*
 l3cBot.on('delivery', (payload, reply) => {
     reply({ text: 'Need something else? I\'m here if needed ! :) ' }, (err) => {
@@ -101,6 +101,9 @@ const requestMovieApi = (endpoint) => {
     return request(options)
         .then(response => {
             return handleMovieList(response.results)
+        })
+        .catch(err => {
+            return `Sorry an error occurred ! :/ we'll dive into it ! ${err.message}`
         })
 }
 
