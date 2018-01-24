@@ -11,5 +11,6 @@ TODO FEATURE:
 
 TODO Technical:
     - better code organisation
+    - check messenger message templates (https://developers.facebook.com/docs/messenger-platform/send-messages/template/list)
     - use async/await (replace request-promise with bent ?)
     - ?
