@@ -33,18 +33,41 @@ l3cBot.on('delivery', (payload, reply) => {
 })
 */
 
+/**
+ * Simple function to pass as callback to reply function on event 'message'
+ *
+ * @param {object} err - reply error object
+ */
+const simpleMessageCallback = (err) => {
+    if (err) {
+        console.log(`Reply error: ${err.message}`)
+    }
+}
+
 l3cBot.on('message', (payload, reply) => {
+    console.log('---- payload', payload)
+
     const text = payload.message.text
 
     return handleUserCommand(text)
         .then(result => {
-            reply({ text: result }, (err) => {
-                if (err) {
-                    console.log(`Reply error: ${err.message}`)
+            result.forEach(movieListPart => {
+                const message = {
+                    attachment: {
+                        type:    'template',
+                        payload: {
+                            template_type:     'list',
+                            top_element_style: 'compact',
+                            elements:          movieListPart
+                        }
+                    }
                 }
 
-                console.log(`Answered: ${result}`)
+                l3cBot.sendMessage(payload.sender.id, message, simpleMessageCallback)
             })
+        })
+        .catch(errorMessage => {
+            reply({ text: errorMessage }, simpleMessageCallback)
         })
 })
 
@@ -52,7 +75,7 @@ l3cBot.on('message', (payload, reply) => {
  * Handle the user command
  *
  * @param {string} message - the user message/command
- * @returns {Promise.<string>}
+ * @returns {Promise.<object>}
  */
 const handleUserCommand = (message) => {
     switch(message) {
@@ -67,7 +90,7 @@ const handleUserCommand = (message) => {
         case constants.easterEgg:
             return Promise.resolve('Pocoyo Pocoyo !!')
         default:
-            return Promise.resolve(`Désolé je ne comprends que les méthodes qui font parties de cette liste: ${constants.commandList}`)
+            return Promise.reject(`Désolé je ne comprends que les méthodes qui font parties de cette liste: ${constants.commandList}`)
     }
 }
 
@@ -75,19 +98,46 @@ const handleUserCommand = (message) => {
  * Return all the movie titles from a movie list
  *
  * @param {array} movieList - TMDB movie list response for the selected endpoint
- * @returns {string} - a concatenation of movie titles
+ * @returns {array.<object>} - a concatenation of movie titles
+ */
+const formatMovieList = (movieList) => {
+    return movieList
+        .map(movie => {
+            return {
+                title: movie.title,
+                subtitle: movie.overview,
+                image_url: `${constants.TMDB_IMAGE_URL}${movie.poster_path}`,
+            }
+        })
+
+}
+
+/**
+ * Split the initial movie list into sublist of 4 movie each since messenger doesn't allow a list to have more than 4 objects
+ *
+ * @param {array<object>} movieList - array of movies object
+ * @returns {Array.<array.<object>>} - a list of smaller list (max 4 object for sublist)
  */
 const handleMovieList = (movieList) => {
-    return movieList
-        .map(movie => movie.title)
-        .join(', ')
+    const motherList = []
+
+    let i = 0
+    do {
+        const subListLimit = i + 4
+
+        motherList.push(movieList.slice(i, subListLimit))
+
+        i = subListLimit
+    } while(motherList.length < movieList.length / 4)
+
+    return motherList
 }
 
 /**
  * Request the given TMDB endpoint
  *
  * @param {string} endpoint - the endpoint to get
- * @returns {Promise.<string>} - return a promise of a TMDB object response
+ * @returns {Promise.<object> | string } - return a promise of a TMDB object response
  */
 const requestMovieApi = (endpoint) => {
     const options = {
@@ -102,8 +152,9 @@ const requestMovieApi = (endpoint) => {
 
     return request(options)
         .then(response => {
-            return handleMovieList(response.results)
+            return formatMovieList(response.results)
         })
+        .then(handleMovieList)
         .catch(err => {
             return `Sorry an error occurred ! :/ we'll dive into it ! ${err.message}`
         })
