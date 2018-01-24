@@ -20,6 +20,8 @@ l3cBot.on('error', function(err) {
     console.log(`Global error: ${err.message}`)
 })
 
+// TODO: need to be reworked ! 
+/*
 l3cBot.on('delivery', (payload, reply) => {
     reply({ text: 'Need something else? I\'m here if needed ! :) ' }, (err) => {
         if (err) {
@@ -29,6 +31,7 @@ l3cBot.on('delivery', (payload, reply) => {
         console.log('Delivery message successfully sent !')
     })
 })
+*/
 
 l3cBot.on('message', (payload, reply) => {
     const text = payload.message.text
