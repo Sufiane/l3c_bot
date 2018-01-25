@@ -46,8 +46,6 @@ const simpleMessageCallback = (err) => {
 }
 
 l3cBot.on('message', (payload, reply) => {
-    console.log('---- payload', payload)
-
     const text = payload.message.text
 
     return handleUserCommand(text)
