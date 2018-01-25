@@ -39,6 +39,7 @@ l3cBot.on('delivery', (payload, reply) => {
  * @param {object} err - reply error object
  */
 const simpleMessageCallback = (err) => {
+    // todo: reply with an error message
     if (err) {
         console.log(`Reply error: ${err.message}`)
     }
@@ -50,19 +51,8 @@ l3cBot.on('message', (payload, reply) => {
     const text = payload.message.text
 
     return handleUserCommand(text)
-        .then(result => {
-            result.forEach(movieListPart => {
-                const message = {
-                    attachment: {
-                        type:    'template',
-                        payload: {
-                            template_type:     'list',
-                            top_element_style: 'compact',
-                            elements:          movieListPart
-                        }
-                    }
-                }
-
+        .then(messages => {
+            messages.forEach(message => {
                 l3cBot.sendMessage(payload.sender.id, message, simpleMessageCallback)
             })
         })
@@ -88,7 +78,7 @@ const handleUserCommand = (message) => {
         case constants.nowPlaying:
             return requestMovieApi(constants.nowPlaying)
         case constants.easterEgg:
-            return Promise.resolve('Pocoyo Pocoyo !!')
+            return Promise.resolve([ { text: 'Pocoyo Pocoyo !! O:)' }])
         default:
             return Promise.reject(`Désolé je ne comprends que les méthodes qui font parties de cette liste: ${constants.commandList}`)
     }
@@ -155,6 +145,20 @@ const requestMovieApi = (endpoint) => {
             return formatMovieList(response.results)
         })
         .then(handleMovieList)
+        .then(movieList => {
+            return movieList.map(subMovieList => {
+                return {
+                    attachment: {
+                        type:    'template',
+                        payload: {
+                            template_type:     'list',
+                            top_element_style: 'compact',
+                            elements:          subMovieList
+                        }
+                    }
+                }
+            })
+        })
         .catch(err => {
             return `Sorry an error occurred ! :/ we'll dive into it ! ${err.message}`
         })
